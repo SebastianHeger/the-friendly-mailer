@@ -13,5 +13,13 @@ I use my raspberry I already had up and running.
 
 Configure a fresh mail account you want to use as a sender and get the SMTP information of the provider. 
 
+Create a .env file with the following content (fill your specs):
+````
+LOG_LEVEL = INFO
+EMAIL_USERNAME_STRATO = username
+EMAIL_PASSWORD_STRATO = password
+EMAIL_SENDER_ADDRESS = account@yourmailprovider.com
+````
+
 Clone this repository and fill all the necessary information into the docker-compose.yml file. 
 Call `docker compose up -d` and voilà, you're done! 

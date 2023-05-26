@@ -1,0 +1,6 @@
+# dev requirements
+aiohttp==3.8.4
+black==23.3.0
+
+# package requirements
+python-dotenv==1.0.0
