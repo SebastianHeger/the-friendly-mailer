@@ -19,7 +19,7 @@ class StratoMailClient:
         self.port = "465"
         self.username = username
         self.password = password
-        self.sender_address = "dopaminetrader@heger-tech.de"
+        self.sender_address = sender_address
         logger.info(msg="Mail client intialized.")
 
     def send_mail(self, receiver_address: str, subject: str, message: str):
