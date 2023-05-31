@@ -1,5 +1,7 @@
+# from email.MIMEMultipart import MIMEMultipart
 from email.mime.text import MIMEText
 import email
+import json
 import os
 from queue import Queue
 import smtplib
@@ -8,6 +10,7 @@ import time
 
 from logger import logger
 from enums import EnvironmentVariable
+import constant
 
 emails = Queue()
 
@@ -24,10 +27,23 @@ class StratoMailClient:
 
     def send_mail(self, receiver_address: str, subject: str, message: str):
         logger.info(msg="Sending email...")
-        msg = MIMEText(message)
-        msg["To"] = email.utils.formataddr(("Recipient", "info@heger-tech.de"))
-        msg["From"] = email.utils.formataddr(("Author", "dopaminetrader@heger-tech.de"))
+
+        # msg = MIMEMultipart()
+        #
+        # msg['From'] = email.utils.formataddr(("Author", self.sender_address))
+        # msg['To'] = email.utils.formataddr(("Recipient", receiver_address))
+        # msg['Subject'] = subject
+        #
+        # body = "TEXT YOU WANT TO SEND"
+        #
+        # msg.attach(MIMEText(body, 'plain'))
+
+
+        msg = MIMEText(message.encode("utf-8"), _charset="utf-8")
+        msg["To"] = email.utils.formataddr(("Recipient", receiver_address))
+        msg["From"] = email.utils.formataddr(("Author", self.sender_address))
         msg["Subject"] = subject
+        # msg = MIMEText('€10'.encode('utf-8'), _charset='utf-8')
         try:
             with smtplib.SMTP_SSL(f"{self.host}:{self.port}") as server:
                 server.login(self.username, self.password)
@@ -41,9 +57,21 @@ class StratoMailClient:
             logger.info(msg="Email successfully sent.")
 
 
-def push_new_email(receiver_address: str, subject: str, message: str):
-    emails.put({"receiver": receiver_address, "subject": subject, "message": message})
+def generate_email():
+    logger.info("New mail will be generated...")
+    with open(constant.config_path / "content.json", "r", encoding="utf-8") as file:
+        content = json.loads(file.read())
+    recipient = content["email"]
+    subject = content["subjects"][0]
+    message = content["greetings"][0] + "\n" + content["bodies"][0]
+    logger.info("Mail has been generated.")
+    push_new_email(receiver_address=recipient, subject=subject, message=message)
 
+
+def push_new_email(receiver_address: str, subject: str, message: str):
+    logger.info("New mail will be put into the queue...")
+    emails.put({"receiver": receiver_address, "subject": subject, "message": message})
+    logger.info("New mail attached to the queue.")
 
 def run_mails():
     email_client = StratoMailClient(
