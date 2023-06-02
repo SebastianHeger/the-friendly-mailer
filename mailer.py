@@ -1,4 +1,5 @@
 # from email.MIMEMultipart import MIMEMultipart
+import random
 from email.mime.text import MIMEText
 import email
 import json
@@ -27,22 +28,10 @@ class StratoMailClient:
 
     def send_mail(self, receiver_address: str, subject: str, message: str):
         logger.info(msg="Sending email...")
-
-        # msg = MIMEMultipart()
-        #
-        # msg['From'] = email.utils.formataddr(("Author", self.sender_address))
-        # msg['To'] = email.utils.formataddr(("Recipient", receiver_address))
-        # msg['Subject'] = subject
-        #
-        # body = "TEXT YOU WANT TO SEND"
-        #
-        # msg.attach(MIMEText(body, 'plain'))
-
         msg = MIMEText(message.encode("utf-8"), _charset="utf-8")
         msg["To"] = email.utils.formataddr(("Recipient", receiver_address))
         msg["From"] = email.utils.formataddr(("Author", self.sender_address))
         msg["Subject"] = subject
-        # msg = MIMEText('€10'.encode('utf-8'), _charset='utf-8')
         try:
             with smtplib.SMTP_SSL(f"{self.host}:{self.port}") as server:
                 server.login(self.username, self.password)
@@ -61,14 +50,16 @@ def generate_email():
     with open(constant.config_path / "content.json", "r", encoding="utf-8") as file:
         content = json.loads(file.read())
     recipient = content["email"]
-    subject = content["subjects"][0]
-    message = content["greetings"][0] + "\n" + content["bodies"][0]
+    subject = random.choice(content["subjects"])
+    message = (
+        random.choice(content["greetings"]) + "\n" + random.choice(content["bodies"])
+    )
     logger.info("Mail has been generated.")
     push_new_email(receiver_address=recipient, subject=subject, message=message)
 
 
 def push_new_email(receiver_address: str, subject: str, message: str):
-    logger.info("New mail will be put into the queue...")
+    logger.info("Attaching new mail to the queue...")
     emails.put({"receiver": receiver_address, "subject": subject, "message": message})
     logger.info("New mail attached to the queue.")
 
@@ -80,11 +71,11 @@ def run_mails():
         sender_address=os.getenv(EnvironmentVariable.EMAIL_SENDER_ADDRESS),
     )
     while True:
-        logger.info(msg="Checking for new mails in queue...")
+        logger.debug(msg="Checking for new mails in queue...")
         try:
             mail = emails.get(block=False)
         except Exception as e:
-            logger.error(msg="No new mail to send.")
+            logger.debug(msg="No new mail to send.")
         else:
             logger.info(msg="New mail detected.")
             email_client.send_mail(

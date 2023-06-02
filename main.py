@@ -18,7 +18,7 @@ trigger_date_time = datetime.now().replace(
     microsecond=0,
 )
 scheduler.add_job(
-    mailer.generate_email, trigger="interval", days=1, start_date=trigger_date_time
+    mailer.generate_email, "interval", days=1, start_date=trigger_date_time
 )
 # scheduler.add_job(mailer.generate_email)
 scheduler.add_job(mailer.run_mails)
