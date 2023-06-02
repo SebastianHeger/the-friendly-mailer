@@ -38,7 +38,6 @@ class StratoMailClient:
         #
         # msg.attach(MIMEText(body, 'plain'))
 
-
         msg = MIMEText(message.encode("utf-8"), _charset="utf-8")
         msg["To"] = email.utils.formataddr(("Recipient", receiver_address))
         msg["From"] = email.utils.formataddr(("Author", self.sender_address))
@@ -72,6 +71,7 @@ def push_new_email(receiver_address: str, subject: str, message: str):
     logger.info("New mail will be put into the queue...")
     emails.put({"receiver": receiver_address, "subject": subject, "message": message})
     logger.info("New mail attached to the queue.")
+
 
 def run_mails():
     email_client = StratoMailClient(
