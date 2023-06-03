@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BlockingScheduler
 import dotenv
 
 from enums import EnvironmentVariable
-import mailer
+import mail.mailer as mailer
 
 dotenv.load_dotenv()
 

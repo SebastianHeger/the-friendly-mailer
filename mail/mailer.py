@@ -9,7 +9,7 @@ import email.utils
 
 import constant
 from enums import EnvironmentVariable
-from logger import logger
+from logger.logger import logger
 
 
 emails = Queue()
