@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  the-friendly-mailer:
+    container_name: the-friendly-mailer
+    build: .
+    restart: always
+    volumes:
+      - ./config/content.json:/app/config/content.json
+      - ./.env:/app/.env
