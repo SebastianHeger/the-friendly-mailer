@@ -15,6 +15,7 @@ Configure a fresh mail account you want to use as a sender and get the SMTP info
 
 Create an `.env` file in the project root with the following content (fill your specs):
 ````
+AUTHOR = author
 LOG_LEVEL = INFO
 EMAIL_USERNAME_STRATO = username
 EMAIL_PASSWORD_STRATO = password
@@ -25,6 +26,7 @@ TRIGGER_HOUR = 8
 Create a content.json file in the config dir with the following content (fill your specs):
 ```json
 {
+  "name": "Linus",
   "email": "receiver@anothermailprovider.com",
   "subjects": [
     "Your subject 1",

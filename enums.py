@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class EnvironmentVariable(str, Enum):
+    AUTHOR = "AUTHOR"
     LOG_LEVEL = "LOG_LEVEL"
     EMAIL_USERNAME_STRATO = "EMAIL_USERNAME_STRATO"
     EMAIL_PASSWORD_STRATO = "EMAIL_PASSWORD_STRATO"

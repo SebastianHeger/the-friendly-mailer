@@ -1,17 +1,16 @@
-# from email.MIMEMultipart import MIMEMultipart
-import random
-from email.mime.text import MIMEText
-import email
 import json
 import os
 from queue import Queue
+import random
 import smtplib
 import time
+from email.mime.text import MIMEText
+import email.utils
 
-
-from logger import logger
-from enums import EnvironmentVariable
 import constant
+from enums import EnvironmentVariable
+from logger import logger
+
 
 emails = Queue()
 
@@ -26,11 +25,15 @@ class StratoMailClient:
         self.sender_address = sender_address
         logger.info(msg="Mail client intialized.")
 
-    def send_mail(self, receiver_address: str, subject: str, message: str):
+    def send_mail(
+        self, receiver_name: str, receiver_address: str, subject: str, message: str
+    ):
         logger.info(msg="Sending email...")
-        msg = MIMEText(message.encode("utf-8"), _charset="utf-8")
-        msg["To"] = email.utils.formataddr(("Recipient", receiver_address))
-        msg["From"] = email.utils.formataddr(("Author", self.sender_address))
+        msg = MIMEText(message, _charset="utf-8")
+        msg["To"] = email.utils.formataddr((receiver_name, receiver_address))
+        msg["From"] = email.utils.formataddr(
+            (os.getenv(EnvironmentVariable.AUTHOR), self.sender_address)
+        )
         msg["Subject"] = subject
         try:
             with smtplib.SMTP_SSL(f"{self.host}:{self.port}") as server:
@@ -49,18 +52,31 @@ def generate_email():
     logger.info("New mail will be generated...")
     with open(constant.config_path / "content.json", "r", encoding="utf-8") as file:
         content = json.loads(file.read())
-    recipient = content["email"]
     subject = random.choice(content["subjects"])
     message = (
         random.choice(content["greetings"]) + "\n" + random.choice(content["bodies"])
     )
     logger.info("Mail has been generated.")
-    push_new_email(receiver_address=recipient, subject=subject, message=message)
+    push_new_email(
+        receiver_name=content["name"],
+        receiver_address=content["email"],
+        subject=subject,
+        message=message,
+    )
 
 
-def push_new_email(receiver_address: str, subject: str, message: str):
+def push_new_email(
+    receiver_name: str, receiver_address: str, subject: str, message: str
+):
     logger.info("Attaching new mail to the queue...")
-    emails.put({"receiver": receiver_address, "subject": subject, "message": message})
+    emails.put(
+        {
+            "receiver_name": receiver_name,
+            "receiver_address": receiver_address,
+            "subject": subject,
+            "message": message,
+        }
+    )
     logger.info("New mail attached to the queue.")
 
 
@@ -79,7 +95,8 @@ def run_mails():
         else:
             logger.info(msg="New mail detected.")
             email_client.send_mail(
-                receiver_address=mail["receiver"],
+                receiver_name=mail["receiver_name"],
+                receiver_address=mail["receiver_address"],
                 subject=mail["subject"],
                 message=mail["message"],
             )
