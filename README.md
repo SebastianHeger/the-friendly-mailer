@@ -41,6 +41,10 @@ Create a content.json file in the config dir with the following content (fill yo
     "You are just the best!", 
     "You rock! \n\n So just rock on! =)",
     "You are the sunshine that brightens my world and I can't imagine a life without your love. "
+  ],
+  "closings": [
+    "With love\nAngelina",
+    "Love\nAngelina"
   ]
 }
 ```

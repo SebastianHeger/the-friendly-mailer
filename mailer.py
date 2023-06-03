@@ -54,7 +54,11 @@ def generate_email():
         content = json.loads(file.read())
     subject = random.choice(content["subjects"])
     message = (
-        random.choice(content["greetings"]) + "\n" + random.choice(content["bodies"])
+        random.choice(content["greetings"])
+        + "\n\n"
+        + random.choice(content["bodies"])
+        + "\n\n"
+        + random.choice(content["closings"])
     )
     logger.info("Mail has been generated.")
     push_new_email(
